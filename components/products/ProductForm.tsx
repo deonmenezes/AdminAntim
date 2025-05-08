@@ -34,7 +34,7 @@ const formSchema = z.object({
   tags: z.array(z.string()),
   sizes: z.array(z.string()),
   colors: z.array(z.string()),
-  price: z.coerce.number().min(0.1),
+  price: z.string().min(1),
   expense: z.coerce.number().min(0.1),
 });
 
@@ -74,6 +74,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
           collections: initialData.collections.map(
             (collection) => collection._id
           ),
+          price: initialData.price.toString(),
         }
       : {
           title: "",
@@ -84,7 +85,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
           tags: [],
           sizes: [],
           colors: [],
-          price: 0.1,
+          price: "",
           expense: 0.1,
         },
   });
@@ -202,8 +203,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                   <FormLabel>Price (AED)</FormLabel>
                   <FormControl>
                     <Input
-                      type="number"
-                      placeholder="Price"
+                      placeholder="Price or 'Contact us for price'"
                       {...field}
                       onKeyDown={handleKeyPress}
                     />
