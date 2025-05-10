@@ -27,7 +27,7 @@ import Loader from "../custom ui/Loader";
 
 const formSchema = z.object({
   title: z.string().min(2).max(75),
-  description: z.string().min(2).max(100).trim(),
+  description: z.string().min(2).max(1000).trim(),
   media: z.array(z.string()),
   category: z.string(),
   collections: z.array(z.string()),
