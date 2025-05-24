@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://www.smoothtradings.com",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Credentials": "true",
 };
 
 export async function OPTIONS() {
@@ -13,10 +14,11 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { cartItems, customer } = await req.json();
-
-    if (!cartItems || !customer) {
-      return new NextResponse("Not enough data to checkout", { status: 400 });
+    const { cartItems, customer } = await req.json();    if (!cartItems || !customer) {
+      return new NextResponse("Not enough data to checkout", { 
+        status: 400,
+        headers: corsHeaders 
+      });
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -31,7 +33,7 @@ export async function POST(req: NextRequest) {
       ],
       line_items: cartItems.map((cartItem: any) => ({
         price_data: {
-          currency: "cad",
+          currency: "aed",
           product_data: {
             name: cartItem.item.title,
             metadata: {
@@ -47,11 +49,12 @@ export async function POST(req: NextRequest) {
       client_reference_id: customer.clerkId,
       success_url: `${process.env.ECOMMERCE_STORE_URL}/payment_success`,
       cancel_url: `${process.env.ECOMMERCE_STORE_URL}/cart`,
-    });
-
-    return NextResponse.json(session, { headers: corsHeaders });
+    });    return NextResponse.json(session, { headers: corsHeaders });
   } catch (err) {
     console.log("[checkout_POST]", err);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return new NextResponse("Internal Server Error", { 
+      status: 500,
+      headers: corsHeaders 
+    });
   }
 }
