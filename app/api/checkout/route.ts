@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://www.smoothtradings.com",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  "Access-Control-Allow-Credentials": "true",
-};
+import { corsHeaders } from "@/lib/cors";
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
