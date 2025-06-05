@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// For troubleshooting, use a more permissive CORS configuration
 export const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://www.smoothtradings.com",
+  "Access-Control-Allow-Origin": "*", // Allow all origins temporarily for debugging
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Origin, Accept",
   "Access-Control-Allow-Credentials": "true",
 };
 

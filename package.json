@@ -1,12 +1,13 @@
 {
   "name": "borcella_admin",
   "version": "0.1.0",
-  "private": true,
-  "scripts": {
+  "private": true,  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "verify-api": "node scripts/verify-api.js",
+    "deploy": "next build && vercel --prod"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.7",

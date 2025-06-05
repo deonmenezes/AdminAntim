@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { corsHeaders } from "@/lib/cors";
+import { debugLog } from "@/lib/debug";
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
@@ -8,13 +9,31 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { cartItems, customer } = await req.json();    if (!cartItems || !customer) {
-      return new NextResponse("Not enough data to checkout", { 
-        status: 400,
-        headers: corsHeaders 
-      });
-    }
+    console.log("[checkout_POST] Starting request processing");
+    const { cartItems, customer } = await req.json();
+    
+    console.log("[checkout_POST] Request data:", { 
+      cartItemsCount: cartItems?.length, 
+      hasCustomer: !!customer 
+    });
+    
+    if (!cartItems || !customer) {
+      return NextResponse.json(
+        { error: "Not enough data to checkout" }, 
+        { 
+          status: 400,
+          headers: corsHeaders 
+        }
+      );    }
 
+    console.log("[checkout_POST] Creating Stripe session with data:", {
+      paymentMethodTypes: ["card"],
+      mode: "payment",
+      allowedCountries: ["US", "CA", "AE", "IN"],
+      itemCount: cartItems.length,
+      currency: "aed"
+    });
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -42,13 +61,18 @@ export async function POST(req: NextRequest) {
       })),
       client_reference_id: customer.clerkId,
       success_url: `${process.env.ECOMMERCE_STORE_URL}/payment_success`,
-      cancel_url: `${process.env.ECOMMERCE_STORE_URL}/cart`,
-    });    return NextResponse.json(session, { headers: corsHeaders });
-  } catch (err) {
+      cancel_url: `${process.env.ECOMMERCE_STORE_URL}/cart`,    });    return NextResponse.json(session, { headers: corsHeaders });  } catch (err: any) {
     console.log("[checkout_POST]", err);
-    return new NextResponse("Internal Server Error", { 
-      status: 500,
-      headers: corsHeaders 
+    debugLog("checkout_error", { 
+      error: err.message, 
+      stack: err.stack 
     });
+    return NextResponse.json(
+      { error: "Internal Server Error", details: err.message },
+      { 
+        status: 500,
+        headers: corsHeaders 
+      }
+    );
   }
 }
